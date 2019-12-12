@@ -21,7 +21,9 @@ export const CONFIG_FILES = [
   '.umirc.library.tsx',
 ];
 
+// 提供几种配置文件类型, 获取配置文件, 并做校验
 export default function({ cwd }): IBundleOptions {
+  // 遍历文件类型, join cwd判断文件存不存在
   const configFile = getExistFile({
     cwd,
     files: CONFIG_FILES,
@@ -36,6 +38,7 @@ export default function({ cwd }): IBundleOptions {
     const userConfig = testDefault(require(configFile)); // eslint-disable-line
     const userConfigs = Array.isArray(userConfig) ? userConfig : [userConfig];
     userConfigs.forEach(userConfig => {
+      // 验证
     const ajv = new AJV({ allErrors: true });
       const isValid = ajv.validate(schema, userConfig);
       if (!isValid) {

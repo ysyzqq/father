@@ -13,7 +13,7 @@ interface IRollupOpts {
   watch?: boolean;
   importLibToEs?: boolean;
 }
-
+// rollup打包
 async function build(entry: string, opts: IRollupOpts) {
   const { cwd, type, log, bundleOpts, importLibToEs } = opts;
   const rollupConfigs = getRollupConfig({
@@ -21,7 +21,7 @@ async function build(entry: string, opts: IRollupOpts) {
     type,
     entry,
     importLibToEs,
-    bundleOpts: normalizeBundleOpts(entry, bundleOpts),
+    bundleOpts: normalizeBundleOpts(entry, bundleOpts), // 标准化配置
   });
 
   for (const rollupConfig of rollupConfigs) {
@@ -43,7 +43,7 @@ async function build(entry: string, opts: IRollupOpts) {
         watcher.close();
       });
     } else {
-      const { output, ...input } = rollupConfig;
+      const { output, ...input } = rollupConfig; // rollup配置一般都是output, ...input(官方格式)
       const bundle = await rollup(input); // eslint-disable-line
       await bundle.write(output); // eslint-disable-line
     }
@@ -51,7 +51,7 @@ async function build(entry: string, opts: IRollupOpts) {
 }
 
 export default async function(opts: IRollupOpts) {
-  if (Array.isArray(opts.entry)) {
+  if (Array.isArray(opts.entry)) { // 一般情况下, entry只有一个,但可能会被用户配置覆盖
     const { entry: entries } = opts;
     for (const entry of entries) {
       await build(entry, opts);

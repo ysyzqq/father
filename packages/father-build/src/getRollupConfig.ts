@@ -32,6 +32,7 @@ interface IPkg {
   name?: string;
 }
 
+// 获取rollup配置
 export default function(opts: IGetRollupConfigOpts): RollupOptions[] {
   const { type, entry, cwd, importLibToEs, bundleOpts } = opts;
   const {

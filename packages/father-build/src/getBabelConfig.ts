@@ -50,17 +50,18 @@ export default function(opts: IGetBabelConfigOpts) {
       }
     }
   }
+  // 判断是否是浏览器环境, 对之后的插件配置有影响
   const targets = isBrowser ? { browsers: ['last 2 versions', 'IE 10'] } : { node: nodeVersion || 6 };
 
   return {
     opts: {
       presets: [
-        ...(typescript ? [require.resolve('@babel/preset-typescript')] : []),
+        ...(typescript ? [require.resolve('@babel/preset-typescript')] : []), // ts预设
         [require.resolve('@babel/preset-env'), {
           targets,
-          modules: type === 'esm' ? false : 'auto'
+          modules: type === 'esm' ? false : 'auto' // esm模式下会编译成import, export
         }],
-        ...(isBrowser ? [require.resolve('@babel/preset-react')] : []),
+        ...(isBrowser ? [require.resolve('@babel/preset-react')] : []), // 浏览器环境加入react预设
       ],
       plugins: [
         ...((type === 'cjs' && lazy && !isBrowser)
@@ -68,7 +69,7 @@ export default function(opts: IGetBabelConfigOpts) {
             lazy: true,
           }]]
           : []),
-        ...(lessInBabelMode ? [transformImportLess2Css] : []),
+        ...(lessInBabelMode ? [transformImportLess2Css] : []), // 将less引入换成css
         require.resolve('babel-plugin-react-require'),
         require.resolve('@babel/plugin-syntax-dynamic-import'),
         require.resolve('@babel/plugin-proposal-export-default-from'),
@@ -82,7 +83,7 @@ export default function(opts: IGetBabelConfigOpts) {
           ? [[require.resolve('@babel/plugin-transform-runtime'), { useESModules: isBrowser && (type === 'esm') }]]
           : []),
         ...(process.env.COVERAGE
-            ? [require.resolve('babel-plugin-istanbul')]
+            ? [require.resolve('babel-plugin-istanbul')] // 一个添加检测代码的插件, 用于集成测试库
             : []
         )
       ],

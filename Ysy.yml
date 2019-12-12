@@ -1,0 +1,47 @@
+打包脚本umi-tools build 就是把lerna包内的src下的文件全部通过babel,配置presets-ts打包到lib下
+我有相应的实现---->qmd-tool
+写构建工具常用的库:
+    yargs-parser: 解析脚本参数
+    signale: 可以自定义ui的提示工具
+    fs-extra: 升级的文件系统
+    path: 路径解析
+    assert: 参数检测,断言
+    chalk: 做一些提示性的文字
+    ora: 命令行的loading显示
+    文件编译相关:
+        babel:
+            @babel/register: 通过require('@babel/register')(config), 让一些特定文件在由node require引入时会被babel 编译
+            配置例子: 
+                ...babelConfig,
+                extensions: ['.es6', '.es', '.jsx', '.js', '.mjs', '.ts', '.tsx'],
+                only: only.map(file => slash(join(cwd, file))),
+                babelrc: false,
+                cache: false,
+        vinyl-fs: 流式文件处理, 用于babel单独编译所有的js文件(webpack和rollup的单入口都会将引用的模块打包进来)
+        through2: 流式文件遍历, 回调file 这俩都是gulp库里的
+        rollup:
+        chokidar: 文件夹监听
+        AJV: 号称最快的jsonschema验证库, 可以校验用户配置参数的准确性
+一些常见的步骤:
+    1: 版本检测 ** -v / --verion
+    const args = yParser(process.argv.slice(2));
+    if (args.v || args.version) {
+    console.log(require('../package').version);
+    process.exit(0);
+    }
+    2: 先安装eslint, prettier相关的代码检测.非必须
+    3: 解析参数, 执行对应的command js文件
+    4: 现在很多lerna格式的多包项目, 很多方法都要兼容lerna, 获取cwd下的lerna packages
+一般可以将command提取成service, 由service对象来执行,参数一般有:
+    cwd: 当前工作路径, 可以传入, 不传入默认传入process.cwd(); 基本每个方法都要从opts中获取cwd, 因为cwd会随打包所在的包而定
+    watch: 是否做文件监听
+
+umi文件里有很多构建相关的独立的方法, 可以提取出来生成一个utils.js, 基本都可以直接用:
+    getBabelConfig: 获取通用的babel配置
+        一般常用的babel插件和presets: 这里的方法可以直接用
+    buildForLerna: readdirSync读取lerna的每个包名, 分包打包
+    build: 单包打包, 这里如果是在lerna里, 传入的cwd就是包的根路径,(会做process的切换 ,并且提供rootpath表明根cwd) 如果不是, 就是脚本启动的process.cwd()
+        build时的配置合并: 入口文件, 根配置, 包配置, 命令行配置
+        srcpath: 源文件路径
+        targetpath: 一般配置了esm就是cwd/es文件夹, cjs和umd就是cwd/lib文件夹
+        tsconfig.json: 获取ts编译配置, 这里得用ts提供的方法去获取, 因为这不是一个有效的json文件

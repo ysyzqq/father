@@ -55,8 +55,10 @@ export default async function(opts: IBabelOpts) {
       lessInBabelMode,
     },
   } = opts;
+  // src路径
   const srcPath = join(cwd, 'src');
   const targetDir = type === 'esm' ? 'es' : 'lib';
+  // 打包目标路径
   const targetPath = join(cwd, targetDir);
 
   log(chalk.gray(`Clean ${targetDir} directory`));
@@ -85,7 +87,7 @@ export default async function(opts: IBabelOpts) {
     const relFile = slash(file.path).replace(`${cwd}/`, '');
     log(`Transform to ${type} for ${chalk[isBrowser ? 'yellow' : 'blue'](relFile)}`);
 
-    return babel.transform(file.contents, {
+    return babel.transform(file.contents, { // babel转换
       ...babelOpts,
       filename: file.path,
     }).code;
@@ -123,6 +125,7 @@ export default async function(opts: IBabelOpts) {
   }
 
   function createStream(src) {
+    // 获取cwd下的ts编译配置
     const tsConfig = getTSConfig();
     const babelTransformRegexp = disableTypeCheck ? /\.(t|j)sx?$/ : /\.jsx?$/;
 
@@ -134,13 +137,13 @@ export default async function(opts: IBabelOpts) {
       return babelTransformRegexp.test(path) && !path.endsWith('.d.ts');
     }
 
-    return vfs
+    return vfs // 转换
       .src(src, {
         allowEmpty: true,
         base: srcPath,
       })
-      .pipe(gulpIf(f => !disableTypeCheck && isTsFile(f.path), gulpTs(tsConfig)))
-      .pipe(gulpIf(f => lessInBabelMode && /\.less$/.test(f.path), gulpLess(lessInBabelMode || {})))
+      .pipe(gulpIf(f => !disableTypeCheck && isTsFile(f.path), gulpTs(tsConfig))) // ts转换
+      .pipe(gulpIf(f => lessInBabelMode && /\.less$/.test(f.path), gulpLess(lessInBabelMode || {}))) // less编译进js
       .pipe(
         gulpIf(
           f => isTransform(f.path),
@@ -152,7 +155,7 @@ export default async function(opts: IBabelOpts) {
                   type,
                 }),
               );
-              // .jsx -> .js
+              // .jsx -> .js 全部转换成js文件
               file.path = file.path.replace(extname(file.path), '.js');
               cb(null, file);
             } catch (e) {
@@ -168,19 +171,20 @@ export default async function(opts: IBabelOpts) {
 
   return new Promise(resolve => {
     const patterns = [
-      join(srcPath, '**/*'),
-      `!${join(srcPath, '**/fixtures{,/**}')}`,
-      `!${join(srcPath, '**/__test__{,/**}')}`,
-      `!${join(srcPath, '**/*.mdx')}`,
+      join(srcPath, '**/*'), // 这里编译所有文件, 可能有less
+      `!${join(srcPath, '**/fixtures{,/**}')}`, // 不包括fixture
+      `!${join(srcPath, '**/__test__{,/**}')}`, // 不包括test文件夹
+      `!${join(srcPath, '**/*.mdx')}`, // 不包括mdx
       `!${join(srcPath, '**/*.+(test|e2e|spec).+(js|jsx|ts|tsx)')}`,
     ];
     createStream(patterns).on('end', () => {
-      if (watch) {
+      if (watch) { // 文件监控
         log(chalk.magenta(`Start watching ${slash(srcPath).replace(`${cwd}/`, '')} directory...`));
         const watcher = chokidar
           .watch(patterns, {
             ignoreInitial: true,
           });
+          // 监听所有文件的变化
         watcher.on('all', (event, fullPath) => {
           const relPath = fullPath.replace(srcPath, '');
           log(`[${event}] ${slash(join(srcPath, relPath)).replace(`${cwd}/`, '')}`);
@@ -189,6 +193,7 @@ export default async function(opts: IBabelOpts) {
             createStream([fullPath]);
           }
         });
+        // 取消回调
         process.once('SIGINT', () => {
           watcher.close();
         });
