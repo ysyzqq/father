@@ -180,7 +180,7 @@ export async function buildForLerna(opts: IOpts) {
   const { cwd } = opts;
 
   // register babel for config files
-  // 为配置文件注册babel
+  // 为多包根路径的配置文件注册babel
   registerBabel({
     cwd,
     only: CONFIG_FILES,
