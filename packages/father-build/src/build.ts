@@ -122,7 +122,7 @@ export async function build(opts: IOpts, extraOpts: IExtraBuildOpts = {}) {
     // 先清除打包dist文件夹
     rimraf.sync(join(cwd, 'dist'));
 
-    // Build umd 打包umd 只能用rollup
+    // Build umd 打包umd 只能用rollup, 这里一般是文件里直接引入了less样式之类的UI库会用umd
     if (bundleOpts.umd) {
       log(`Build umd`);
       await rollup({

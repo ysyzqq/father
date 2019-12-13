@@ -62,9 +62,9 @@ export default function(opts: IGetRollupConfigOpts): RollupOptions[] {
     disableTypeCheck,
     lessInRollupMode = {},
     sassInRollupMode = {},
-  } = bundleOpts;
+  } = bundleOpts; // rollup的配置比较多
   const entryExt = extname(entry);
-  const name = file || basename(entry, entryExt);
+  const name = file || basename(entry, entryExt); // 提供了自定义的file就用
   const isTypeScript = entryExt === '.ts' || entryExt === '.tsx';
   const extensions = ['.js', '.jsx', '.ts', '.tsx', '.es6', '.es', '.mjs'];
 
@@ -73,7 +73,7 @@ export default function(opts: IGetRollupConfigOpts): RollupOptions[] {
     pkg = require(join(cwd, 'package.json')); // eslint-disable-line
   } catch (e) {}
 
-  // cjs 不给浏览器用，所以无需 runtimeHelpers
+  // cjs 不给浏览器用，所以无需 runtimeHelpers, cjs一般都是node用, 浏览器一般是umd, esm
   const runtimeHelpers = type === 'cjs' ? false : runtimeHelpersOpts;
   const babelOpts = {
     ...(getBabelConfig({
@@ -92,7 +92,7 @@ export default function(opts: IGetRollupConfigOpts): RollupOptions[] {
     extensions,
   };
   if (importLibToEs && type === 'esm') {
-    babelOpts.plugins.push(require.resolve('../lib/importLibToEs'));
+    babelOpts.plugins.push(require.resolve('../lib/importLibToEs')); // 自己写的插件, 作用:
   }
   babelOpts.presets.push(...extraBabelPresets);
   babelOpts.plugins.push(...extraBabelPlugins);
@@ -143,10 +143,10 @@ export default function(opts: IGetRollupConfigOpts): RollupOptions[] {
   function getPlugins(opts = {} as { minCSS: boolean; }) {
     const { minCSS } = opts;
     return [
-      url(),
-      svgr(),
-      postcss({
-        extract: extractCSS,
+      url(), // 解析inline url 例如import png from "./image.png";
+      svgr(), // 解析svg
+      postcss({ // less,scss,css编译
+        extract: extractCSS, // 默认不提取编译后的css文件 ,会直接通过js注入到<head>
         inject: injectCSS,
         modules,
         minimize: !!minCSS,
@@ -154,7 +154,7 @@ export default function(opts: IGetRollupConfigOpts): RollupOptions[] {
           [
             'less',
             {
-              plugins: [new NpmImport({ prefix: '~' })],
+              plugins: [new NpmImport({ prefix: '~' })], // less编译
               javascriptEnabled: true,
               ...lessInRollupMode,
             },
@@ -168,13 +168,13 @@ export default function(opts: IGetRollupConfigOpts): RollupOptions[] {
         ],
         plugins: [autoprefixer(autoprefixerOpts), ...extraPostCSSPlugins],
       }),
-      ...(injectOpts ? [inject(injectOpts)] : []),
-      ...(replaceOpts && Object.keys(replaceOpts || {}).length ? [replace(replaceOpts)] : []),
+      ...(injectOpts ? [inject(injectOpts)] : []), // 
+      ...(replaceOpts && Object.keys(replaceOpts || {}).length ? [replace(replaceOpts)] : []), // 替换window变量插件
       nodeResolve({
         mainFields: ['module', 'jsnext:main', 'main'],
         extensions,
         ...nodeResolveOpts,
-      }),
+      }), // 模块解析
       ...(isTypeScript
         ? [
           typescript2({

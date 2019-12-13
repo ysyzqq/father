@@ -13,6 +13,7 @@ function getTitle(name: string) {
     .replace(/-/g, '');
 }
 
+/** storybook的构建会去检索examples下面的文件, 这里会生成一些基础文件*/
 function generateFiles(projectPath: string) {
   const pkg = require(join(projectPath, './package.json'));
   const tempStorybookPath = join(projectPath, STORYBOOK_FOLDER);
@@ -24,7 +25,7 @@ function generateFiles(projectPath: string) {
   const importSourceString = [];
   const addString = [];
 
-  // Get all files
+  // Get all files 先获取所有的js文件
   const files: string[] = sync(join(projectPath, 'examples/*.@(js|ts|jsx|tsx)'), {});
 
   // Get pure file name without prefix path & suffix
@@ -39,16 +40,16 @@ function generateFiles(projectPath: string) {
   fileNames.forEach(fileName => {
     const ComponentName = getTitle(fileName);
 
-    importString.push(`import ${ComponentName} from '../examples/${fileName}';`);
+    importString.push(`import ${ComponentName} from '../examples/${fileName}';`); // 生成对应的组件导入代码
     importSourceString.push(
-      `import ${ComponentName}Source from 'rc-source-loader!../examples/${fileName}';`,
+      `import ${ComponentName}Source from 'rc-source-loader!../examples/${fileName}';`, // 生成对应的jscode展示代码
     );
 
     addString.push(`.add('${fileName}', () => <${ComponentName} />,{
       source: {
         code: ${ComponentName}Source,
       },
-    })`);
+    })`); // storybook的添加函数
   });
   /**
    * 设置主题，默认还是白色的
@@ -56,7 +57,7 @@ function generateFiles(projectPath: string) {
    * 这两种都是自带的
    */
   const theme = process.env.STORYBOOK_THEME || 'light';
-  // Generate template
+  // Generate template 生成模板代码
   const fileContent = `
 /* eslint-disable import/no-webpack-loader-syntax */
 import React from 'react';

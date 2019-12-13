@@ -79,7 +79,7 @@ export default async function(opts: IBabelOpts) {
       lessInBabelMode,
     });
     if (importLibToEs && type === 'esm') {
-      babelOpts.plugins.push(require.resolve('../lib/importLibToEs'));
+      babelOpts.plugins.push(require.resolve('../lib/importLibToEs')); // 这个插件的作用是将/lib/de引入转化为/es/
     }
     babelOpts.presets.push(...extraBabelPresets);
     babelOpts.plugins.push(...extraBabelPlugins);
@@ -143,7 +143,7 @@ export default async function(opts: IBabelOpts) {
         base: srcPath,
       })
       .pipe(gulpIf(f => !disableTypeCheck && isTsFile(f.path), gulpTs(tsConfig))) // ts转换
-      .pipe(gulpIf(f => lessInBabelMode && /\.less$/.test(f.path), gulpLess(lessInBabelMode || {}))) // less编译进js
+      .pipe(gulpIf(f => lessInBabelMode && /\.less$/.test(f.path), gulpLess(lessInBabelMode || {}))) // less转换成css
       .pipe(
         gulpIf(
           f => isTransform(f.path),

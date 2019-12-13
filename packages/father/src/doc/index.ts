@@ -29,6 +29,7 @@ export function devOrBuild(option: DocProps) {
   return docz.devOrBuild(mergedOption);
 }
 
+// 文档部署
 export function deploy({ cwd, args }) {
   return new Promise((resolve, reject) => {
     const distDir = join(cwd, DOC_PATH);

@@ -3,6 +3,7 @@ import { join } from 'path';
 const cwd = process.cwd();
 const pkg = require(join(cwd, 'package.json'));
 
+// father提供的统一的storybook webpack配置 , 我觉得不是很灵活
 module.exports = ({ config, ...rest }) => {
   config.module.rules.push({
     test: /\.(ts|tsx)$/,
