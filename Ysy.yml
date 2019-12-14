@@ -34,6 +34,7 @@
     4: 现在很多lerna格式的多包项目, 很多方法都要兼容lerna, 获取cwd下的lerna packages
     5: 打包一般有两种
         babel: 编译纯的js文件, 单文件到单文件,  不涉及样式,文件相关 如果有less文件,只是单纯的less->css, 具体的css-loader交给外部app的打包工具
+            registerBabel: 现在的配置文件都是用es6写的, 所以一些除了cwd/src下面的文件要注册babel
         rollup/webpack: 打包app相关, 打包入口文件时会将依赖打包进来, 一些ui库会涉及到; 直接通过postcss或less-loader等将css打入js中
             rollup配置: 参考getRollupConfig.ts, 有一些rollup常见的app配置, 例如rollup相关的svg,url,postcss
     组件库预览的打包:

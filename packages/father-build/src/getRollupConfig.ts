@@ -92,7 +92,7 @@ export default function(opts: IGetRollupConfigOpts): RollupOptions[] {
     extensions,
   };
   if (importLibToEs && type === 'esm') {
-    babelOpts.plugins.push(require.resolve('../lib/importLibToEs')); // 自己写的插件, 作用:
+    babelOpts.plugins.push(require.resolve('../lib/importLibToEs')); // 自己写的插件, 作用: 把引入/lib/* 转换成/es/* 
   }
   babelOpts.presets.push(...extraBabelPresets);
   babelOpts.plugins.push(...extraBabelPlugins);

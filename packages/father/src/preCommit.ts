@@ -20,6 +20,7 @@ const PRETTIER_PARSER = {
 const cwd = process.cwd();
 
 // register babel for config files
+// 因为配置文件现在都是用es6写的, 所有要先注册babel
 registerBabel({
   cwd,
   only: CONFIG_FILES,
@@ -85,6 +86,7 @@ function runCmd(cmd: string, args: string[]) {
   });
 }
 
+// 获取prettier配置, 没有的话获取umi自带的
 function getPrettierConfig() {
   const prettierrcPath = join(cwd, '.prettierrc');
 

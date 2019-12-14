@@ -111,6 +111,7 @@ export default async function(opts: IBabelOpts) {
     return config ? config.compilerOptions : undefined
   }
 
+  // 获取tsconfig, 如果当前包下没有, 去取根包下的, 如果还没有, 提供默认的
   function getTSConfig() {
     const tsconfigPath = join(cwd, 'tsconfig.json');
     const templateTsconfigPath = join(__dirname, '../template/tsconfig.json');
@@ -143,7 +144,8 @@ export default async function(opts: IBabelOpts) {
         base: srcPath,
       })
       .pipe(gulpIf(f => !disableTypeCheck && isTsFile(f.path), gulpTs(tsConfig))) // ts转换
-      .pipe(gulpIf(f => lessInBabelMode && /\.less$/.test(f.path), gulpLess(lessInBabelMode || {}))) // less转换成css
+      // less转换成css, 这里只做简单的less->css, 没有用postcss等less插件(不同于rollup)
+      .pipe(gulpIf(f => lessInBabelMode && /\.less$/.test(f.path), gulpLess(lessInBabelMode || {}))) 
       .pipe(
         gulpIf(
           f => isTransform(f.path),
