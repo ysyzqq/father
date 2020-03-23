@@ -13,7 +13,10 @@ function getTitle(name: string) {
     .replace(/-/g, '');
 }
 
-/** storybook的构建会去检索examples下面的文件, 这里会生成一些基础文件*/
+/** 
+ * storybook的构建会去检索examples下面的文件, 这里会生成一些基础文件
+ * 动态生成storybook需要的配置文件
+ * */
 function generateFiles(projectPath: string) {
   const pkg = require(join(projectPath, './package.json'));
   const tempStorybookPath = join(projectPath, STORYBOOK_FOLDER);
@@ -25,7 +28,7 @@ function generateFiles(projectPath: string) {
   const importSourceString = [];
   const addString = [];
 
-  // Get all files 先获取所有的js文件
+  // Get all files 先获取所有的js文件 在example文件夹下面
   const files: string[] = sync(join(projectPath, 'examples/*.@(js|ts|jsx|tsx)'), {});
 
   // Get pure file name without prefix path & suffix

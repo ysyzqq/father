@@ -6,7 +6,7 @@ export function devOrBuild({ cwd, cmd, DOC_PATH, args = {} }: Partial<DocProps>)
   const { storybookPath } = generator(cwd);
 
   if (cmd === 'build') {
-    return storybook({
+    return storybook({ // 这里要查看storybook文档
       mode: 'static',
       outputDir: DOC_PATH,
       configDir: storybookPath,
