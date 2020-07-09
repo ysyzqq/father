@@ -185,7 +185,7 @@ export async function buildForLerna(opts: IOpts) {
     cwd,
     only: CONFIG_FILES,
   });
-  // 获取用户配置文件
+  // 获取用户配置文件 这里是lerna根目录的rc文件, 配置了各个包的打包顺序, 因为有依赖关系所以有的包要先打
   const userConfig = getUserConfig({ cwd });
   let pkgs = readdirSync(join(cwd, 'packages'));
 
